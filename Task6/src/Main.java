@@ -15,7 +15,7 @@
 5. Закройте как `FileInputStream`, так и `FileOutputStream` после завершения фильтрации.
 6. Проверьте, что `filtered.txt` содержит отфильтрованные данные.
  */
-import java.io.BufferedInputStream;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,20 +35,19 @@ public class Main {
         fileOutputStream.write(greetings.getBytes());
         fileOutputStream.close();
 
-        FileInputStream fileInputStream = new FileInputStream("C:\\Test\\source.txt");
-        fileOutputStream = new FileOutputStream("C:\\Test\\target.txt", true);
+        try (FileInputStream fis = new FileInputStream("C:\\Test\\source.txt");
+             FileOutputStream fos = new FileOutputStream("C:\\Test\\filtered.txt")) {
 
-        BufferedInputStream bufferedInputStream= new BufferedInputStream(fileInputStream);
-        String str = bufferedInputStream.toString();
-        String str2 = str.replaceAll("Лучше","");
+            int bytesRead;
+            byte[] buffer = new byte[1024];
 
-        //   System.out.println(str2);
-        int i;
-        while (str2.isEmpty()) {
-
-            fileOutputStream.write((char)i);
-
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                String data = new String(buffer, 0, bytesRead);
+                data = data.replaceAll("Лучше","");
+                fos.write(data.getBytes());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        fileOutputStream.close();
     }
 }
